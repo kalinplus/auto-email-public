@@ -2,7 +2,7 @@
 
 [中文](README_ZH.md) | English
 
-Automated cold email sender for graduate school applications. Collect advisor info, write to Feishu (optional), and send via SMTP — driven by CLI or GitHub Actions cron.
+Automated graduate application cold-email sender. With the skill + Claude Code workflow, you can run one-click Feishu archiving (optional) and scheduled SMTP batch sending (GitHub Actions).
 
 ## Workflow
 
@@ -36,6 +36,8 @@ git clone <repo-url>
 cd auto-email
 ```
 
+It is recommended to keep your GitHub repository private to avoid leaking personal information, so clone is recommended over fork.
+
 ### 2. Prepare Your CV
 
 Place your CV as `CV.pdf` in the project root:
@@ -50,16 +52,18 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 | Secret | Description | Example |
 |---|---|---|
-| `SMTP_HOST` | SMTP server | `smtp.gmail.com` |
+| `SMTP_HOST` | SMTP server | `smtp.163.com` |
 | `SMTP_PORT` | SMTP port | `465` |
-| `SMTP_USER` | Sender email | `you@gmail.com` |
-| `SMTP_PASS` | Email app password | (not your login password) |
-| `SENDER_NAME` | Display name | `Your Name` |
-| `FEISHU_APP_TOKEN` | Feishu table token *(optional)* | `W8d2bsAz...` |
-| `FEISHU_TABLE_ID` | Feishu table ID *(optional)* | `tblJNhhDD...` |
+| `SMTP_USER` | Sender email | `you@163.com` |
+| `SMTP_PASS` | Email app password | (usually 16 characters, not your login password) |
+| `SENDER_NAME` | Display name | `Zhang San` |
+| `FEISHU_APP_TOKEN` | Feishu table token *(optional)* | `...` |
+| `FEISHU_TABLE_ID` | Feishu table ID *(optional)* | `...` |
 | `CV_PATH` | CV file path | `./CV.pdf` |
 
-If you don't use Feishu, the `FEISHU_APP_TOKEN` and `FEISHU_TABLE_ID` secrets are not required — just don't use the `--write` flag.
+For details on how to obtain these values, search online by yourself.
+
+If you do not use Feishu, `FEISHU_APP_TOKEN` and `FEISHU_TABLE_ID` are not required. When using the skill to add pending entries, choose the corresponding option.
 
 ### 4. Enable Actions Write Permission
 
@@ -67,11 +71,7 @@ If you don't use Feishu, the `FEISHU_APP_TOKEN` and `FEISHU_TABLE_ID` secrets ar
 
 ### 5. Add Advisor Entries
 
-Edit `advisors.json` directly, or use the CLI:
-
-```bash
-python main.py advisors.json --add '{"name_zh":"...", "name_en":"...", "school_college":"...", "email":"...", "email_subject":"...", "email_body":"..."}'
-```
+It is recommended to use CLI tools like Claude Code with the `advisor-mailer` skill in `.claude` and provide the structured JSON described in [Advisor Data Format](#advisor-data-format). It will ask for confirmations, then automatically complete Feishu writing (optional), `advisors.json` update, and reminders.
 
 ### 6. Push and Send
 
@@ -82,6 +82,8 @@ git push
 ```
 
 GitHub Actions will send unsent emails on the next cron trigger. You can also manually trigger it from the **Actions** tab.
+
+After triggering, existing entries in `advisors.json` will have `sent` set to `true` (meaning already sent). You should run `git pull` to get the latest changes and avoid conflicts.
 
 ## Advisor Data Format
 
@@ -103,31 +105,7 @@ Each entry in `advisors.json`:
 }
 ```
 
-### Writing Effective Cold Emails
-
-Your `email_body` should be concise and personalized:
-
-1. **Who you are**: Your name, current institution, and program
-2. **Why this advisor**: Mention a specific paper or research direction that interests you
-3. **What you bring**: Your relevant skills, experience, or research background
-4. **Call to action**: Ask if they are accepting new students or request a brief meeting
-
-Example (customize to your own background):
-
-```
-Dear Professor [Name],
-
-My name is [Your Name] and I am currently a [degree] student at [University]. I have been following your work on [specific topic], particularly your paper "[paper title]".
-
-I am very interested in pursuing [degree] under your supervision. My background in [relevant skill/field] has prepared me well for research in this area. [1-2 sentences about your relevant experience].
-
-Would you be available for a brief call to discuss potential opportunities in your group? I have attached my CV for your reference.
-
-Thank you for your time.
-
-Best regards,
-[Your Name]
-```
+How to get these fields? It is recommended to use AI products with stronger web search capabilities (such as Tabbit), and let them search by school and advisor name to generate this structured output.
 
 ## Internal Fields (auto-managed)
 
@@ -168,14 +146,20 @@ python main.py advisors.json --all
 
 ## Scheduled Sending
 
-Default cron is UTC 23:05 (Beijing 07:05). Adjust in `.github/workflows/send-email.yml`. GitHub Actions cron may delay 5–15 minutes — this is normal platform behavior. Use **Run workflow** in the Actions tab for immediate sending.
+Default cron is Beijing time 07:05. You can change it in `.github/workflows/send-email.yml`.
+
+GitHub Actions cron may delay 60-120 minutes (in practice, setting 07:05 may trigger around 08:05). This is normal platform behavior. If you need immediate sending, run it manually from the Actions page.
 
 ## Tech Stack
 
 - Python 3.9+ / smtplib / argparse
-- arxiv (paper verification), tenacity (retry), python-dotenv (config)
+- tenacity (retry), python-dotenv (config)
 - lark-cli (Feishu table, local only)
 - GitHub Actions (scheduled + manual trigger)
+
+## TODO
+
+arxiv (paper verification): verify papers in upstream JSON and ensure the target advisor name appears in the paper.
 
 ## License
 
