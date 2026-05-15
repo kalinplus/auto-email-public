@@ -65,6 +65,18 @@ For details on how to obtain these values, search online by yourself.
 
 If you do not use Feishu, `FEISHU_APP_TOKEN` and `FEISHU_TABLE_ID` are not required. When using the skill to add pending entries, choose the corresponding option.
 
+To use Feishu for archiving, create a new Feishu Bitable and obtain its Token and Table ID (fill them into `FEISHU_APP_TOKEN` and `FEISHU_TABLE_ID` above). The table must contain at least the following fields:
+
+| Field Name | Type | Description |
+|---|---|---|
+| 导师姓名 | Text | Required |
+| 学校-学院 | Text | Required |
+| 研究领域 | Text | Optional |
+| 发信邮箱 | Text | Required |
+| 当前进展 | Text | Fixed value "已发信" |
+| 初次发信日期 | Date | Unix millisecond timestamp, auto-filled |
+| 个人主页 | URL | Optional |
+
 ### 4. Enable Actions Write Permission
 
 **Settings → Actions → General → Workflow permissions** → Select **Read and write permissions** → Save.

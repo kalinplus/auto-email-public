@@ -63,6 +63,18 @@ cp /path/to/你的CV.pdf ./CV.pdf
 
 不使用飞书的话，`FEISHU_APP_TOKEN` 和 `FEISHU_TABLE_ID` 可以不配。在使用 skill 的时候新增待发送条目时，选择相应选项就行。
 
+如果使用飞书表格对套磁的老师进行归档，需要新建一个飞书多维表格，获取其 Token 和 Table ID（这两个值对应填入上方的 `FEISHU_APP_TOKEN` 和 `FEISHU_TABLE_ID`）。表格中至少（当然可以有更多字段方便记录复盘）需要包含以下字段：
+
+| 字段名 | 类型 | 说明 |
+|---|---|---|
+| 导师姓名 | 文本 | 必填 |
+| 学校-学院 | 文本 | 必填 |
+| 研究领域 | 文本 | 可选 |
+| 发信邮箱 | 文本 | 必填 |
+| 当前进展 | 文本 | 固定写为"已发信" |
+| 初次发信日期 | 日期 | Unix 毫秒时间戳，自动填入 |
+| 个人主页 | URL | 可选 |
+
 ### 4. 开启 Actions 写入权限
 
 仓库 → Settings → Actions → General → Workflow permissions → 选 **Read and write permissions** → Save。
